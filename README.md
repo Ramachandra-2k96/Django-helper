@@ -10,7 +10,7 @@ Django Helper is a tool to assist with Django project tasks. Follow the instruct
 2. **Clone the Project:**
    - Navigate to the desired location and clone the Django Helper project:
      ```bash
-     git clone (https://github.com/Ramachandra-2k96/Django-helper.git)
+     git clone https://github.com/Ramachandra-2k96/Django-helper.git
      ```
 
 3. **Copy Files:**
