@@ -7,6 +7,27 @@ BOLD = '\033[1m'
 ARROW_DOWN = '↓'
 MAGENTA="\033[35m"
 CYAN="\033[36m"
+code_by = "Code by"
+Name = """
+██████╗  ██╗ ███╗   ██  █████╗  ██████╗ ██╗   ██╗	
+██╔══██╗ ██║ ████╗  ██║██╔══██╗	██╔══██╗╚██╗ ██╔╝	
+██████╔╝ ██║ ██╔██╗ ██║███████║ ██████╔╝ ╚████╔╝ 	
+██╔══██╗ ██║ ██║╚██╗██║██╔══██║ ██╔══██╗  ╚██╔╝  	
+██████╔╝ ██║ ██║ ╚████║██║  ██║ ██║  ██║   ██║   	
+╚═════╝  ╚═╝ ╚═╝  ╚═══╝╚═╝  ╚═╝ ╚═╝  ╚═╝   ╚═╝   	
+██╗    ██╗ ██╗   ██╗ ██╗███████╗██████╗ ███████╗  ██████╗ ███████╗██████╗ ███████╗
+██║    ██║ ██║   ██║ ██║██╔════╝██╔══██╗██╔═══╝   ██╔══██╗██╔════╝██╔══██╗██╔════╝ 
+██║ █╗ ██║ ████████║ ██║███████╗██████╝ ███████╗  ██████╔╝███████╗██████╔╝███████╗  
+██║███╗██║ ██║   ██║ ██║╚════██║██╔══   ██╔════╝  ██╔══██╗██╔════╝██╔══██╗██╔════╝ 
+╚███╔███╔╝ ██║   ██║ ██║███████║██╝ 	███████╗  ██║  ██║███████╗██║  ██║███████╗
+ ╚══╝╚══╝  ╚═╝   ╚═╝ ╚═╝╚══════╝╚═╝  	╚══════╝  ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝ 
+"""
+# Function to print "code by" message with smaller font size
+def print_code_by():
+    # Print "code by" message with reduced spacing between characters
+    print("\n"+f"{BOLD}{GREEN}"+" ".join(letter for letter in code_by))
+
+
 
 def create_django_project(project_name,app_name):
     try :
@@ -252,6 +273,8 @@ def setup_urls(project_name,app_name):
     print(f"{BOLD}{GREEN}2.index.html-Display result within {{param1}}{RESET}")
          
 if __name__ == "__main__":
+    print_code_by()
+    print(Name)
     selected_option = input(f"{BOLD}{MAGENTA}Choose an option: \n1.Create new project \n2.Create App for existing project \n3.Exit\n{RESET}")
     if selected_option == "1":
         project_name = input(f"{CYAN}Enter Django project name: ")
