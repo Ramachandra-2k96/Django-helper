@@ -1,9 +1,9 @@
-# Django Helper
+# Django Helper  🚀
 
 Django Helper is a tool to assist with Django project tasks. Follow the instructions below to get started.
 By completing this procedure you will be able to use this utility on any terminal in your system. 
 
-## Usage and Setup in Windows
+## 🛠️ Usage and Setup in Windows
 
 1. **Include Main Python Script:**
    - Check whether the python script path is available in your system environmental variables.
@@ -33,7 +33,7 @@ By completing this procedure you will be able to use this utility on any termina
      ```
    - If you think that this command is too large you can rename the file to ** help_dj.bat ** or ** help_dj ** so that it will be easy to call and remember
 
-## Usage and Setup in Linux
+## 🐧 Usage and Setup in Linux
 1. **Check if Python is installed**: Some Linux distributions come with Python pre-installed. You can check if Python is already installed by opening a terminal and typing:
 
 ```bash
@@ -94,11 +94,12 @@ If Python is installed, it will display the version number. If not, you'll see a
    ```bash
    help_dj
    ```
-## Contact for Support
+## 📞 Contact for Support
 
-If you encounter any bugs in the code or need assistance, feel free to reach out to us. We're here to help! Additionally, if you have any suggestions for improvement, we'd love to hear from you.
+We're here to assist you every step of the way. If you encounter any issues, have suggestions for improvement, or simply want to reach out, please feel free to contact us:
 
-Please contact us here:
-- [Email](mailto:ramachandraudupa.sangamone@gmail.com)
-- [GitHub Issues](https://github.com/Ramachandra-2k96/Django-helper/issues)
-- [LinkedIn](https://in.linkedin.com/in/ramachandra-udupa)
+- **Email**: [ramachandraudupa.sangamone@gmail.com](mailto:ramachandraudupa.sangamone@gmail.com)
+- **GitHub Issues**: [Report issues here](https://github.com/Ramachandra-2k96/Django-helper/issues)
+- **LinkedIn**: [Connect with us](https://in.linkedin.com/in/ramachandra-udupa)
+
+---
