@@ -77,19 +77,23 @@ If Python is installed, it will display the version number. If not, you'll see a
      git clone https://github.com/Ramachandra-2k96/Django-helper.git
      ```
 5. Create a script named `help_dj`:(Location of file will be different for you)
-   ```bash
+   - ```
+     nano help_dj
+     ```
+     inside the file write this:
+   ```bash 
    #!/bin/bash
    python /home/user/Desktop/Django-helper.py
    ```
-6. Save the script to `/usr/local/bin`:(By default most of the users system have this)
+7. Save the script to `/usr/local/bin`:(By default most of the users system have this)
    ```bash
    sudo mv help_dj /usr/local/bin
    ```
-7. Make the script executable:
+8. Make the script executable:
    ```bash
    sudo chmod +x /usr/local/bin/help_dj
    ```
-8. Now, you can run `help_dj` from any directory in the terminal:
+9. Now, you can run `help_dj` from any directory in the terminal:
  - Navigate to deisred location in terminal where you want to create your project and try the commands 
    ```bash
    help_dj
