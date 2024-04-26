@@ -35,8 +35,6 @@ def create_django_project(project_name,app_name):
         os.system(f"django-admin startproject {project_name}")
         create_Django_App(project_name,app_name)
     except Exception as e:
-        if os.path.exists(project_name):
-            shutil.rmtree(project_name)
         print(f"{BOLD}{RED}Error : {e}!{RESET}")
         
 def create_Django_App(project_name,app_name):
