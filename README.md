@@ -83,7 +83,7 @@ If Python is installed, it will display the version number. If not, you'll see a
      inside the file write this:
    ```bash 
    #!/bin/bash
-   python /home/user/Desktop/Django-helper.py
+   python /home/user/Desktop/django-helper.py
    ```
 7. Save the script to `/usr/local/bin`:(By default most of the users system have this)
    ```bash
