@@ -12,6 +12,7 @@ ARROW_DOWN = '↓'
 MAGENTA="\033[35m"
 CYAN="\033[36m"
 code_by = "Project by"
+
 Name = """
  ██████╗  ██████╗  ███████╗   ███████╗ 
 ██╔════╝ ██╔═══██╗ ██╔═══██║  ██╔═══╝ 
@@ -99,7 +100,7 @@ class normal_Django(Normal_Use_Functions):
             
     def create_Django_App(self,project_name,app_name):
         try :
-            # Step 1: Move to Django app
+            # Step 1: Move to Django Project
             os.chdir(project_name)
             # Step 2: Create a Django app
             os.system(f"django-admin startapp {app_name}") 
@@ -330,45 +331,52 @@ class normal_Django(Normal_Use_Functions):
         print(f"{BOLD}{GREEN}1.views.py-Create your logic here and pass the result as param1 to index.html{RESET}")
         print(f"{BOLD}{GREEN}2.index.html-Display result within {{param1}}{RESET}")
          
-         
+class Django_REST(Normal_Use_Functions):
+    pass   
+
+class Django_Websocket(Normal_Use_Functions):
+    pass
+
+   
 if __name__ == "__main__":
     
     normal = normal_Django()
     normal.print_code_by()
     print(Name)
-    selected_option = input(f"{BOLD}{MAGENTA}Choose an option: \n1.Create new project \n2.Create App for existing project \n3.Exit\n{RESET}")
+    selected_option = input(f"{BOLD}{MAGENTA}\n\n1.Create new project \n2.Create App for existing project \n3.Exit\n\nChoose an option: {RESET}")
     if selected_option == "1":
         project_name = input(f"{CYAN}Enter Django project name: ")
+        
         if os.path.exists(project_name):
-            print(f"{BOLD}{RED}Project exists please try with different names {RESET}")    
+            print(f"{BOLD}{RED}\nProject exists please try with different names {RESET}")    
         else:
-            try:
-                import django
-            except:
-                os.system("pip install django")
             app_name = input(f"{CYAN}Enter new Django App name: ")
             if os.path.exists(app_name):
-                print(f"{BOLD}{RED}app exists please try with different names {RESET}")    
+                print(f"{BOLD}{RED}\napp exists please try with different names {RESET}")    
             else:
                 normal.create_django_project(project_name,app_name)
+                
     elif selected_option == "2":
         project_name = input(f"{CYAN}Enter Django project name: ")
         condition = os.path.exists(project_name)
         project_dir=os.path.abspath(project_name)
         all_files_and_dirs = os.listdir(project_dir)
+        
         if condition and not ('manage.py' in all_files_and_dirs or project_name in all_files_and_dirs) :
             print(f"{BOLD}{MAGENTA} I think you are inside the project direcotry so i am going one directory level up{RESET}")
             os.chdir(os.path.dirname(os.path.dirname(project_dir)))
-            print(os.getcwd())
+            
         while(condition):
             app_name = input(f"{CYAN}Enter new Django App name: ")
-            while(os.path.exists(os.path.join(project_name,app_name))):
+            while(os.path.exists(os.path.join(os.path.join(project_name,project_name),app_name))):
                 print(f"{BOLD}{RED}app exists please try with different names {RESET}")
                 app_name = input("Enter new Django App name: ")
+            os.chdir(project_name)
+            print(os.getcwd())
             normal.create_Django_App(project_name,app_name)
             break
         else:
-            print(f"{BOLD}{RED}project does not exists please try with different names {RESET}")    
+            print(f"{BOLD}{RED}\nproject does not exists please try with different names {RESET}")    
     else:
-        print(f"{BOLD}{RED}Exiting")
+        print(f"{BOLD}{RED}\nExiting.....")
 

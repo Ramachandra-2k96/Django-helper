@@ -12,6 +12,7 @@ ARROW_DOWN = '↓'
 MAGENTA="\033[35m"
 CYAN="\033[36m"
 code_by = "Project by"
+
 Name = """
  ██████╗  ██████╗  ███████╗   ███████╗ 
 ██╔════╝ ██╔═══██╗ ██╔═══██║  ██╔═══╝ 
@@ -330,7 +331,13 @@ class normal_Django(Normal_Use_Functions):
         print(f"{BOLD}{GREEN}1.views.py-Create your logic here and pass the result as param1 to index.html{RESET}")
         print(f"{BOLD}{GREEN}2.index.html-Display result within {{param1}}{RESET}")
          
-         
+class Django_REST(Normal_Use_Functions):
+    pass   
+
+class Django_Websocket(Normal_Use_Functions):
+    pass
+
+   
 if __name__ == "__main__":
     
     normal = normal_Django()
