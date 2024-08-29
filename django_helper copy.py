@@ -11,7 +11,7 @@ BOLD = '\033[1m'
 ARROW_DOWN = '↓'
 MAGENTA="\033[35m"
 CYAN="\033[36m"
-code_by = "Code by"
+code_by = "Project by"
 Name = """
  ██████╗  ██████╗  ███████╗   ███████╗ 
 ██╔════╝ ██╔═══██╗ ██╔═══██║  ██╔═══╝ 
@@ -27,72 +27,73 @@ Name = """
  ╚══▀▀═╝   ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═══╝   ╚═╝     ╚═════╝ ╚═╝     ╚═╝
 """
 
-# Function to print "code by" message with smaller font size
-def print_code_by():
-    # Print "code by" message with reduced spacing between characters
-    print("\n"+f"{BOLD}{GREEN}"+" ".join(letter for letter in code_by))
+class Normal_Use_Functions:
+    # Function to print "code by" message with smaller font size
+    def print_code_by(self):
+        # Print "code by" message with reduced spacing between characters
+        print("\n"+f"{BOLD}{GREEN}"+" ".join(letter for letter in code_by))
+        
+    def run_command(self, command):
+        """Run a shell command and print output."""
+        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        for line in process.stdout:
+            print(line.decode(), end='')
+        for line in process.stderr:
+            print(line.decode(), end='')
+        process.wait()
+        
+    def run_command_in_env(self,python_bin,command):
+        """Run a shell command and print output."""
+        full_command = f"{python_bin} -m {command}"
+        process = subprocess.Popen(full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        for line in process.stdout:
+            print(line.decode(), end='')
+        for line in process.stderr:
+            print(line.decode(), end='')
+        process.wait()
+        
+    def is_virtualenv(self):
+        """Check if the script is running inside a virtual environment."""
+        return (
+            hasattr(sys, 'real_prefix') or
+            (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix) or
+            os.getenv('VIRTUAL_ENV') is not None
+        )  
+    def create_virtualenv(self, venv_name = "venv"):
+        """Create a virtual environment."""
+        self.run_command(f"python3 -m venv {venv_name}")
+        
+    def platform_script(self, venv_name ="venv"):
+        """Return the activation script command based on the platform."""
+        if platform.system() == "Windows":
+            python_bin = os.path.join(venv_name, 'Scripts', 'python.exe')
+        else:
+            python_bin = os.path.join(venv_name, 'bin', 'python')
+        return python_bin
+        
+    def install_dependecy(self, python_path,dependecy="django"):
+        """Install Django in the virtual environment."""
+        self.run_command_in_env(python_bin=python_path,command="pip install --upgrade pip")
+        self.run_command_in_env(python_bin=python_path,command=f"pip install {dependecy}")
+        
+    def generate_requirements(self, python_path,file_name = "requirements.txt"):
+        """Generate a requirements.txt file with the installed packages."""
+        self.run_command_in_env(python_bin=python_path,command=f"pip freeze > {file_name}")
     
-def run_command(command):
-    """Run a shell command and print output."""
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    for line in process.stdout:
-        print(line.decode(), end='')
-    for line in process.stderr:
-        print(line.decode(), end='')
-    process.wait()
-    
-def run_command_in_env(python_bin,command):
-    """Run a shell command and print output."""
-    full_command = f"{python_bin} -m {command}"
-    process = subprocess.Popen(full_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    for line in process.stdout:
-        print(line.decode(), end='')
-    for line in process.stderr:
-        print(line.decode(), end='')
-    process.wait()
-    
-def is_virtualenv():
-    """Check if the script is running inside a virtual environment."""
-    return (
-        hasattr(sys, 'real_prefix') or
-        (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix) or
-        os.getenv('VIRTUAL_ENV') is not None
-    )  
-def create_virtualenv(venv_name = "venv"):
-    """Create a virtual environment."""
-    run_command(f"python3 -m venv {venv_name}")
-    
-def platform_script(venv_name ="venv"):
-    """Return the activation script command based on the platform."""
-    if platform.system() == "Windows":
-        python_bin = os.path.join(venv_name, 'Scripts', 'python.exe')
-    else:
-        python_bin = os.path.join(venv_name, 'bin', 'python')
-    return python_bin
-    
-def install_dependecy(python_path,dependecy="django"):
-    """Install Django in the virtual environment."""
-    run_command_in_env(python_bin=python_path,command="pip install --upgrade pip")
-    run_command_in_env(python_bin=python_path,command=f"pip install {dependecy}")
-    
-def generate_requirements(python_path,file_name = "requirements.txt"):
-    """Generate a requirements.txt file with the installed packages."""
-    run_command_in_env(python_bin=python_path,command=f"pip freeze > {file_name}")
-    
-class normal_Django:
+class normal_Django(Normal_Use_Functions):
     #Code Quantum
     def create_django_project(self,project_name,app_name):
         try :
             os.makedirs(project_name, exist_ok=True)
             os.chdir(project_name)
-            create_virtualenv()
-            python_bin = platform_script()
+            self.create_virtualenv()
+            python_bin = self.platform_script()
             """ Install All dependency's"""    
-            install_dependecy(python_path=python_bin,dependecy="django")       
+            self.install_dependecy(python_path=python_bin,dependecy="django")       
             os.system(f"django-admin startproject {project_name}")
             self.create_Django_App(project_name,app_name)
             os.chdir(os.path.dirname(os.getcwd()))
-            generate_requirements(python_path=python_bin)
+            self.generate_requirements(python_path=python_bin)
         except Exception as e:
             print(f"{BOLD}{RED}Error : {e}!{RESET}")
             
@@ -331,9 +332,10 @@ class normal_Django:
          
          
 if __name__ == "__main__":
-    print_code_by()
-    print(Name)
+    
     normal = normal_Django()
+    normal.print_code_by()
+    print(Name)
     selected_option = input(f"{BOLD}{MAGENTA}Choose an option: \n1.Create new project \n2.Create App for existing project \n3.Exit\n{RESET}")
     if selected_option == "1":
         project_name = input(f"{CYAN}Enter Django project name: ")
