@@ -11,6 +11,7 @@ BOLD = '\033[1m'
 ARROW_DOWN = '↓'
 MAGENTA="\033[35m"
 CYAN="\033[36m"
+BG_WHITE = '\033[47m'
 code_by = "Project by"
 
 Name = """
@@ -33,6 +34,7 @@ class Normal_Use_Functions:
     def print_code_by(self):
         # Print "code by" message with reduced spacing between characters
         print("\n"+f"{BOLD}{GREEN}"+" ".join(letter for letter in code_by))
+        print(Name)
         
     def run_command(self, command):
         """Run a shell command and print output."""
@@ -332,51 +334,178 @@ class normal_Django(Normal_Use_Functions):
         print(f"{BOLD}{GREEN}2.index.html-Display result within {{param1}}{RESET}")
          
 class Django_REST(Normal_Use_Functions):
-    pass   
-
+    def create_django_project(self,project_name,app_name):
+        try :
+            os.makedirs(project_name, exist_ok=True)
+            os.chdir(project_name)
+            self.create_virtualenv()
+            python_bin = self.platform_script()
+            """ Install All dependency's"""    
+            self.install_dependecy(python_path=python_bin,dependecy="django djangorestframework")       
+            os.system(f"django-admin startproject {project_name}")
+            os.chdir(project_name)
+            # Step 2: Create a Django app
+            os.system(f"django-admin startapp {app_name}")
+            os.chdir(project_name)
+            self.setup_setting(project_name,'rest_framework')
+            self.setup_setting(project_name,app_name)
+            self.setup_urls(project_name,app_name)
+            
+            self.setup_models(project_name,app_name)
+            self.create_views(project_name,app_name)
+            self.create_serializer(project_name,app_name)
+            
+            os.chdir(os.path.dirname(os.path.dirname(os.getcwd())))
+            self.generate_requirements(python_path=python_bin)
+            
+        except Exception as e:
+            print(f"{BOLD}{RED}Error : {e} !{RESET}")
+            
+    def setup_setting(self, project_name, app_name):
+        with open("settings.py", "r+") as file:
+            content = file.read()
+            # Modify ALLOWED_HOSTS
+            modified_content = content.replace("ALLOWED_HOSTS = []", "ALLOWED_HOSTS = ['*']")
+            # Modify INSTALLED_APPS
+            lines = modified_content.splitlines()
+            for idx, line in enumerate(lines):
+                if 'INSTALLED_APPS' in line:
+                    # Insert the app name if not already in the list
+                    if f"'{app_name}'" not in lines[idx + 1]:
+                        lines[idx + 1] = lines[idx + 1].rstrip() + f"\n    '{app_name}',"
+                    break
+            # Write the changes back to the file
+            file.seek(0)
+            file.write("\n".join(lines))
+            file.truncate()
+ 
+    def setup_models(self, project_name, app_name):
+        """entry directory /home/ramachandra/Desktop/Django-helper/r/r/r"""
+        os.chdir(os.path.join(os.path.dirname(os.getcwd()),app_name))
+        """ now /home/ramachandra/Desktop/Django-helper/r/r/a"""
+        with open("models.py", "w") as file:
+            content="""from django.db import models\n\nclass Item(models.Model):\n\tname = models.CharField(max_length=100)\n\tdescription = models.TextField()\n\tdef __str__(self):\n\t\treturn self.name"""
+            file.write(content)
+            
+    def create_serializer(self, project_name, app_name):
+        with open("serializers.py", "w") as file:
+            content="""from rest_framework import serializers\nfrom .models import Item\n\nclass ItemSerializer(serializers.ModelSerializer):\n\tclass Meta:\n\t\tmodel = Item\n\t\tfields = '__all__'"""
+            file.write(content)
+    
+    def create_views(self, project_name, app_name):
+        with open("views.py", "w") as file:
+            content="""from rest_framework import generics\nfrom .models import Item\nfrom .serializers import ItemSerializer\nclass ItemListCreate(generics.ListCreateAPIView):\n\tqueryset = Item.objects.all()\n\tserializer_class = ItemSerializer\nclass ItemDetail(generics.RetrieveUpdateDestroyAPIView):\n\tqueryset = Item.objects.all()\n\tserializer_class = ItemSerializer"""
+            file.write(content)
+        with open("urls.py", "w") as file:
+            content="""from django.urls import path\nfrom .views import ItemListCreate, ItemDetail\nurlpatterns = [\n\tpath('items/', ItemListCreate.as_view(), name='item-list-create'),\n\tpath('items/<int:pk>/', ItemDetail.as_view(), name='item-detail'),\n]"""
+            file.write(content)
+        
+    def setup_urls(self, project_name, app_name):
+        with open("urls.py", "r+") as file:
+            content = file.read()
+            if "from django.urls import path, include" not in content:
+                modified_content = content.replace("from django.urls import path", "from django.urls import path, include")
+                file.seek(0)
+                file.write(modified_content)
+            file.truncate()  # If the new content is shorter than the original, truncate the file
+        with open("urls.py", 'r')as file:
+            list= file.readlines()
+        index=0
+        for j,i in enumerate(list):
+            if 'urlpatterns=[' in i.replace(" ", ""):
+                index=j
+                break
+        list[index]=list[index]+f"\tpath('{app_name}/',include('{app_name}.urls')),\n"
+        with open("urls.py", 'w')as file:
+            file.writelines(list)
+        print(f"{BOLD}{GREEN}Next steps are below {ARROW_DOWN}{RESET}")
+        print(f"{BOLD}{GREEN}1.views.py - Create your logic here and pass the result as param1 to index.html{RESET}")
+        print(f"{BOLD}{GREEN}2. models and create serializer {RESET}")
+        print(f"{BOLD}{GREEN}3. Run the below command {ARROW_DOWN} {RESET}")
+        print(f"{BG_WHITE}{MAGENTA}python manage.py makemigrations{RESET}\n{BG_WHITE}{MAGENTA}python manage.py migrate{RESET}")
+    
 class Django_Websocket(Normal_Use_Functions):
     pass
 
-   
-if __name__ == "__main__":
-    
-    normal = normal_Django()
-    normal.print_code_by()
-    print(Name)
-    selected_option = input(f"{BOLD}{MAGENTA}\n\n1.Create new project \n2.Create App for existing project \n3.Exit\n\nChoose an option: {RESET}")
-    if selected_option == "1":
-        project_name = input(f"{CYAN}Enter Django project name: ")
-        
-        if os.path.exists(project_name):
-            print(f"{BOLD}{RED}\nProject exists please try with different names {RESET}")    
-        else:
-            app_name = input(f"{CYAN}Enter new Django App name: ")
-            if os.path.exists(app_name):
-                print(f"{BOLD}{RED}\napp exists please try with different names {RESET}")    
-            else:
-                normal.create_django_project(project_name,app_name)
-                
-    elif selected_option == "2":
-        project_name = input(f"{CYAN}Enter Django project name: ")
-        condition = os.path.exists(project_name)
-        project_dir=os.path.abspath(project_name)
-        all_files_and_dirs = os.listdir(project_dir)
-        
-        if condition and not ('manage.py' in all_files_and_dirs or project_name in all_files_and_dirs) :
-            print(f"{BOLD}{MAGENTA} I think you are inside the project direcotry so i am going one directory level up{RESET}")
-            os.chdir(os.path.dirname(os.path.dirname(project_dir)))
-            
-        while(condition):
-            app_name = input(f"{CYAN}Enter new Django App name: ")
-            while(os.path.exists(os.path.join(os.path.join(project_name,project_name),app_name))):
-                print(f"{BOLD}{RED}app exists please try with different names {RESET}")
-                app_name = input("Enter new Django App name: ")
-            os.chdir(project_name)
-            print(os.getcwd())
-            normal.create_Django_App(project_name,app_name)
-            break
-        else:
-            print(f"{BOLD}{RED}\nproject does not exists please try with different names {RESET}")    
-    else:
-        print(f"{BOLD}{RED}\nExiting.....")
 
+def call_function(option:int)->int:
+    match option:
+        case 1:
+                selected_option = 0
+                normal = normal_Django()
+                while True:
+                    selected_option = int(input(f"{BOLD}{MAGENTA}\n\n1.Create new project \n2.Create App for existing project \n3.GO Back\n\nChoose an option: {RESET}"))
+                    if not 0<selected_option<=3:
+                        print(f"{BOLD}{BG_WHITE}{RED}\nInvalid option {RESET}")
+                        pass
+                    else:
+                        break
+                    
+                if selected_option == 1:
+                    project_name = input(f"{CYAN}Enter Django project name: ")
+                    
+                    if os.path.exists(project_name):
+                        print(f"{BOLD}{RED}\nProject exists please try with different names {RESET}")    
+                    else:
+                        app_name = input(f"{CYAN}Enter new Django App name: ")
+                        if os.path.exists(app_name):
+                            print(f"{BOLD}{RED}\napp exists please try with different names {RESET}")    
+                        else:
+                            normal.create_django_project(project_name,app_name)
+                            
+                elif selected_option == 2:
+                    project_name = input(f"{CYAN}Enter Django project name: ")
+                    condition = os.path.exists(project_name)
+                    project_dir=os.path.abspath(project_name)
+                    all_files_and_dirs = os.listdir(project_dir)
+                    
+                    if condition and not ('manage.py' in all_files_and_dirs or project_name in all_files_and_dirs) :
+                        print(f"{BOLD}{MAGENTA} I think you are inside the project direcotry so i am going one directory level up{RESET}")
+                        os.chdir(os.path.dirname(os.path.dirname(project_dir)))
+                        
+                    while(condition):
+                        app_name = input(f"{CYAN}Enter new Django App name: ")
+                        while(os.path.exists(os.path.join(os.path.join(project_name,project_name),app_name))):
+                            print(f"{BOLD}{RED}app exists please try with different names {RESET}")
+                            app_name = input("Enter new Django App name: ")
+                        os.chdir(project_name)
+                        print(os.getcwd())
+                        normal.create_Django_App(project_name,app_name)
+                        break
+                    else:
+                        print(f"{BOLD}{RED}\nproject does not exists please try with different names {RESET}")    
+                elif selected_option == 3:
+                    return -1
+                return 0
+            
+        case 2:
+            rest = Django_REST()
+            project_name = input(f"\n{CYAN}Enter Django-Rest project name: ")
+            
+            if os.path.exists(project_name):
+                print(f"{BOLD}{RED}\nProject exists please try with different names {RESET}")    
+            else:
+                app_name = input(f"{CYAN}Enter new Django App name: ")
+                if os.path.exists(app_name):
+                    print(f"{BOLD}{RED}\napp exists please try with different names {RESET}")    
+                else:
+                    rest.create_django_project(project_name,app_name)
+                    
+            return 0
+        
+        case 3:
+            return 0
+        
+        case _:
+            print(f"{BOLD}{BG_WHITE}{RED}\nInvalid option{RESET}")
+            return -1
+        
+        
+if __name__ == "__main__": 
+    normal = Normal_Use_Functions()
+    normal.print_code_by()
+    while True :
+        selected_option = int(input(f"{BOLD}{MAGENTA}\n\n1.Django Project \n2.Django-REST Project \n3.Exit\n\nChoose an option: {RESET}"))
+        output = call_function(selected_option)
+        if output == 0:
+            break
