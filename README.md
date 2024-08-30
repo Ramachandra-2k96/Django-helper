@@ -5,33 +5,35 @@ By completing this procedure you will be able to use this utility on any termina
 
 ## 🛠️ Usage and Setup in Windows
 
-1. **Include Main Python Script:**
-   - Check whether the python script path is available in your system environmental variables.
-   - If it is not there then add the path to your main Python script to the environmental variables.
-
-2. **Clone the Project:**
+1. **Clone the Project:**
    - Navigate to the desired location and clone the Django Helper project:
      ```bash
      git clone https://github.com/Ramachandra-2k96/Django-helper.git
      ```
 
-3. **Copy Files:**
-   - Copy the two required files from the cloned project to the `Scripts` folder:
-     - django_helper.bat
-     - django_helper.py
-
-4. **Update Path in Bat File:**
-   - Open the bat file (assuming it's named `django-helper.bat`) and update the path to Django Helper:** (The location of bat python file will be different for you) **
+2. **Update the Batch File:**
+   - Navigate to the cloned project directory and locate `django_helper.bat`.
+   - Open `django_helper.bat` in a text editor.
+   - Update the path to the Python script in the batch file:
      ```bat
-     python C:\Users\ramac\AppData\Local\Programs\Python\Python311\Scripts\django_helper.py
+     python C:\path\to\your\django_helper.py
      ```
+     Replace `C:\path\to\your\` with the actual path to `django_helper.py` in the cloned project.
 
-5. **Execute Module:**
-   - Open any terminal and run the following command:
+3. **Add Batch File Path to System Environment Variables:**
+   - Copy the path to the directory containing `django_helper.bat`.
+   - Open the Start Menu, search for "Environment Variables," and select "Edit the system environment variables."
+   - In the System Properties window, click the "Environment Variables" button.
+   - In the Environment Variables window, locate the `Path` variable in the "System variables" section, and click "Edit."
+   - Click "New" and add the path to the directory containing `django_helper.bat`.
+   - Click "OK" to close all dialog boxes.
+
+4. **Execute the Module:**
+   - Open any terminal or Command Prompt and run:
      ```bash
-     django-helper.bat
+     django_helper.bat
      ```
-   - If you think that this command is too large you can rename the file to ** help_dj.bat ** or ** help_dj ** so that it will be easy to call and remember
+   - For convenience, you can rename the batch file to something shorter, like `help_dj.bat`, and update the path in the system environment variables accordingly. This will make it easier to call and remember.
 
 ## 🐧 Usage and Setup in Linux
 1. **Check if Python is installed**: Some Linux distributions come with Python pre-installed. You can check if Python is already installed by opening a terminal and typing:
