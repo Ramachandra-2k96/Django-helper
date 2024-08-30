@@ -62,6 +62,7 @@ class Normal_Use_Functions:
             (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix) or
             os.getenv('VIRTUAL_ENV') is not None
         )  
+    
     def create_virtualenv(self, venv_name = "venv"):
         """Create a virtual environment."""
         self.run_command(f"python3 -m venv {venv_name}")
@@ -280,8 +281,7 @@ class normal_Django(Normal_Use_Functions):
             js_file.write(js)
         with open(os.path.join(f"static/{app_name}/css", "style.css"), "w") as css_file:
             css_file.write(css)
-        
-        
+         
     def make_view(self,project_name,app_name):
         # Update/create views.py and write a method to run
         with open(os.path.join(app_name,"views.py"), "a") as file:
@@ -290,7 +290,6 @@ class normal_Django(Normal_Use_Functions):
             file.write(f"from django import forms\nclass inputform(forms.Form):\n\tinput=forms.CharField(label='Enter')\n")
         with open(os.path.join(app_name,"urls.py"), "w") as file:
             file.write(f"from django.urls import path\nfrom {app_name}.views import home\nurlpatterns = [\n\tpath('',home),\n]")
-
 
     def setup_setting(self,project_name,app_name):
         os.chdir(os.path.dirname(os.getcwd()))
@@ -425,8 +424,198 @@ class Django_REST(Normal_Use_Functions):
         print(f"{BG_WHITE}{MAGENTA}python manage.py makemigrations{RESET}\n{BG_WHITE}{MAGENTA}python manage.py migrate{RESET}")
     
 class Django_Websocket(Normal_Use_Functions):
-    pass
+    def create_Djnago_project(self, project_name, app_name):
+        try :
+            os.makedirs(project_name, exist_ok=True)
+            os.chdir(project_name)
+            self.create_virtualenv()
+            python_bin = self.platform_script()
+            """ Install All dependency's"""    
+            self.install_dependecy(python_path=python_bin,dependecy="django channels daphne")       
+            os.system(f"django-admin startproject {project_name}")
+            os.chdir(project_name)
+            # Step 2: Create a Django app
+            os.system(f"django-admin startapp {app_name}")
+            os.chdir(project_name)
+            self.edit_settings(project_name,app_name)
+            self.edit_asgi(project_name,app_name)
+            self.configure_mainurl(project_name,app_name)
+            
+            """entry directory /home/ramachandra/Desktop/Django-helper/r/r/r"""
+            os.chdir(os.path.join(os.path.dirname(os.getcwd()),app_name))
+            """ now /home/ramachandra/Desktop/Django-helper/r/r/a"""
+            
+            self.create_consumers()
+            self.create_routing()
+            self.configure_appurl()
+            self.configure_views(app_name)
+            self.write_html(app_name)
+            
+            os.chdir(os.path.dirname(os.path.dirname(os.getcwd())))
+            self.generate_requirements(python_path=python_bin)
+            print(f"{BG_WHITE} Run : {GREEN} daphne -b 0.0.0.0 -p 8000 {project_name}.asgi:application{RESET}{BG_WHITE} in terminal to view ouput at {GREEN} http://127.0.0.1:8000/app/ {RESET}")
+            
+        except Exception as e:
+            print(f"{BOLD}{RED}Error : {e} !{RESET}")
+    
+    def edit_settings(self, project_name, app_name):
+        with open("settings.py", "r+") as file:
+            content = file.read()
+            # Modify ALLOWED_HOSTS
+            modified_content = content.replace("ALLOWED_HOSTS = []", "ALLOWED_HOSTS = ['*']")
+            # Modify INSTALLED_APPS
+            modified_content = modified_content.replace(f"WSGI_APPLICATION = '{project_name}.wsgi.application'", f"ASGI_APPLICATION = '{project_name}.asgi.application'")
+            lines = modified_content.splitlines()
+            for idx, line in enumerate(lines):
+                if 'INSTALLED_APPS' in line:
+                    # Insert the app name if not already in the list
+                    if f"'{app_name}'" not in lines[idx + 1]:
+                        lines[idx + 1] = lines[idx + 1].rstrip() + f"\n\t'{app_name}',\n\t'channels',"
+                    break
+            # Write the changes back to the file
+            file.seek(0)
+            file.write("\n".join(lines))
+            file.truncate()
+        with open('settings.py','a') as file:
+            content ="""CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+"""
+            file.write("\n\n"+content)
+    
+    def edit_asgi(self, project_name, app_name):
+        with open('asgi.py', 'w') as file:
+            content = f"""import os
+from channels.routing import ProtocolTypeRouter, URLRouter
+from django.core.asgi import get_asgi_application
+from channels.auth import AuthMiddlewareStack
+from {app_name}.routing import websocket_urlpatterns
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', '{project_name}.settings')
+
+application = ProtocolTypeRouter({{
+    "http": get_asgi_application(),
+    "websocket": AuthMiddlewareStack(
+        URLRouter(
+            websocket_urlpatterns
+        )
+    ),
+}})
+    """
+            file.write(content)
+
+    def configure_mainurl(self, project_name, app_name):
+        with open("urls.py", "r+") as file:
+            content = file.read()
+            if "from django.urls import path, include" not in content:
+                modified_content = content.replace("from django.urls import path", "from django.urls import path, include")
+                file.seek(0)
+                file.write(modified_content)
+            file.truncate()  # If the new content is shorter than the original, truncate the file
+        with open("urls.py", 'r')as file:
+            list= file.readlines()
+        index=0
+        for j,i in enumerate(list):
+            if 'urlpatterns=[' in i.replace(" ", ""):
+                index=j
+                break
+        list[index]=list[index]+f"\tpath('{app_name}/',include('{app_name}.urls')),\n"
+        with open("urls.py", 'w')as file:
+            file.writelines(list)   
+    
+    def create_consumers(self):
+        with open('consumers.py','w')as file:
+            content = """import json
+from channels.generic.websocket import WebsocketConsumer
+
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+
+    def disconnect(self, close_code):
+        pass
+
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json['message']
+
+        # Echo the received message back to WebSocket
+        self.send(text_data=json.dumps({
+            'message': "I recived : "+message
+        }))
+"""     
+            file.write(content)
+
+    def create_routing(self):
+        with open('routing.py','w')as file:
+            content = """from django.urls import re_path
+from .consumers import ChatConsumer
+
+websocket_urlpatterns = [
+    re_path(r'ws/chat/$', ChatConsumer.as_asgi()),
+]
+"""
+            file.write(content)
+        
+    def configure_appurl(self):
+        with open('urls.py','w')as file:
+            content ="""from django.urls import path
+from .views import home
+urlpatterns = [
+    path('',home)
+]
+"""
+            file.write(content)
+            
+    def configure_views(self, app_name):
+        with open('views.py','w')as file:
+            content= f"""from django.shortcuts import render
+def home(request):
+    return render(request, '{app_name}/index.html')"""
+            file.write(content)
+    
+    def write_html(self, app_name):
+        os.makedirs(f'templates/{app_name}', exist_ok=True)
+        with open(f'templates/{app_name}/index.html','w') as file:
+            content ="""<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Example</title>
+</head>
+<body>
+    <h1>WebSocket Test</h1>
+    <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+    <input id="chat-message-input" type="text" size="100"><br>
+    <button id="send-message">Send</button>
+
+    <script>
+        const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/');
+
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.querySelector('#chat-log').value += (data.message + '');
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#send-message').onclick = function() {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+    </script>
+</body>
+</html>
+"""
+            file.write(content)
 
 def call_function(option:int)->int:
     match option:
@@ -494,18 +683,31 @@ def call_function(option:int)->int:
             return 0
         
         case 3:
+                socket = Django_Websocket()
+                project_name = input(f"\n{CYAN}Enter Django-Web socket project name: ")
+                
+                if os.path.exists(project_name):
+                    print(f"{BOLD}{RED}\nProject exists please try with different names {RESET}")    
+                else:
+                    app_name = input(f"{CYAN}Enter new Django App name: ")
+                    if os.path.exists(app_name):
+                        print(f"{BOLD}{RED}\napp exists please try with different names {RESET}")    
+                    else:
+                        socket.create_Djnago_project(project_name,app_name)
+                        
+                return 0
+        case 4:
             return 0
         
         case _:
             print(f"{BOLD}{BG_WHITE}{RED}\nInvalid option{RESET}")
             return -1
         
-        
 if __name__ == "__main__": 
     normal = Normal_Use_Functions()
     normal.print_code_by()
     while True :
-        selected_option = int(input(f"{BOLD}{MAGENTA}\n\n1.Django Project \n2.Django-REST Project \n3.Exit\n\nChoose an option: {RESET}"))
+        selected_option = int(input(f"{BOLD}{MAGENTA}\n\n1.Django Project \n2.Django-REST Project \n3.Django-Web socket \n4.Exit\nChoose an option: {RESET}"))
         output = call_function(selected_option)
         if output == 0:
             break
