@@ -3,7 +3,7 @@
 Django Helper is a tool to assist with Django project tasks. Follow the instructions below to get started.
 By completing this procedure you will be able to use this utility on any terminal in your system. 
 
-## 🛠️ Usage and Setup in Windows
+## 🛠️ Usage and Setup in 🪟 Windows
 
 1. **Clone the Project:**
    - Navigate to the desired location and clone the Django Helper project:
