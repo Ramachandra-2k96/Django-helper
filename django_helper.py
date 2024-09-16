@@ -65,7 +65,7 @@ class Normal_Use_Functions:
     
     def create_virtualenv(self, venv_name = "venv"):
         """Create a virtual environment."""
-        self.run_command(f"python3 -m venv {venv_name}")
+        self.run_command(f"python -m venv {venv_name}")
         
     def platform_script(self, venv_name ="venv"):
         """Return the activation script command based on the platform."""
