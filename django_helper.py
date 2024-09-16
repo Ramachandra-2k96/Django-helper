@@ -65,7 +65,10 @@ class Normal_Use_Functions:
     
     def create_virtualenv(self, venv_name = "venv"):
         """Create a virtual environment."""
-        self.run_command(f"python -m venv {venv_name}")
+        if platform.system() == "Windows":
+            self.run_command(f"python -m venv {venv_name}")
+        else:
+            self.run_command(f"python3 -m venv {venv_name}")
         
     def platform_script(self, venv_name ="venv"):
         """Return the activation script command based on the platform."""
@@ -86,18 +89,20 @@ class Normal_Use_Functions:
     
 class normal_Django(Normal_Use_Functions):
     #Code Quantum
+    def __init__(self) -> None:
+        super().__init__()
+        self.python_bin = self.platform_script()
     def create_django_project(self,project_name,app_name):
         try :
             os.makedirs(project_name, exist_ok=True)
             os.chdir(project_name)
             self.create_virtualenv()
-            python_bin = self.platform_script()
             """ Install All dependency's"""    
-            self.install_dependecy(python_path=python_bin,dependecy="django")       
-            os.system(f"django-admin startproject {project_name}")
+            self.install_dependecy(python_path=self.python_bin,dependecy="django")       
+            self.run_command_in_env(python_path=self.python_bin, command=f"django-admin startproject {project_name}")
             self.create_Django_App(project_name,app_name)
             os.chdir(os.path.dirname(os.getcwd()))
-            self.generate_requirements(python_path=python_bin)
+            self.generate_requirements(python_path=self.python_bin)
         except Exception as e:
             print(f"{BOLD}{RED}Error : {e}!{RESET}")
             
@@ -106,7 +111,7 @@ class normal_Django(Normal_Use_Functions):
             # Step 1: Move to Django Project
             os.chdir(project_name)
             # Step 2: Create a Django app
-            os.system(f"django-admin startapp {app_name}") 
+            self.run_command_in_env(python_path=self.python_bin, command=f"django-admin startapp {app_name}") 
             self.setup_template(project_name,app_name)
             self.setup_setting(project_name,app_name)
             self.make_view(project_name,app_name)
